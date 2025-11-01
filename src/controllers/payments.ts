@@ -1,56 +1,42 @@
-import { getDb } from "../config/db";
-import { ObjectId } from "mongodb";
 import { Request, Response } from "express";
-
-
-const collection = () => getDb().collection("Payments");
+import { PaymentModel } from "../models/payment.model";
 
 export const getAllPayments = async (req: Request, res: Response) => {
   try {
-    const data = await collection().find().toArray();
+    const data = await PaymentModel.getAll();
     res.status(200).json(data);
   } catch (error) {
-    res.status(500).send("Error obteniendo pagos");
+    res.status(500).json({ message: "Error obteniendo pagos" });
   }
 };
 
-//Get de un pago o un icome en concreto
 export const getPayId = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    if (!ObjectId.isValid(id)) return res.status(400).send("El no es valido");
-    const data = await collection().findOne({
-      _id: new ObjectId(id),
-    })
-    !data ? res.status(404).send("No hay ninguna persona con ese id") : res.status(200).send(data);
+    const data = await PaymentModel.getById(id);
+    if (!data) return res.status(404).send("No se encontró el pago");
+    res.status(200).json(data);
   } catch (error) {
-    console.log("error al buscar un pago con un id");
+    res.status(500).send("Error buscando el pago");
   }
-
-}
-
-
-//Balance
-/*router.get("/balance", (req, res) => {
-
-})*/
-
+};
 
 export const insertPayment = async (req: Request, res: Response) => {
-  //VAlidaciones
   try {
-    const nuevaTransacion = await collection().insertOne(req.body)
-    res.status(202).send(nuevaTransacion);
+    const nuevaTransaccion = await PaymentModel.insert(req.body);
+    res.status(201).json(nuevaTransaccion);
   } catch (error) {
-    console.log("no se ha podido crear una transicion");
+    res.status(500).send("No se pudo crear la transacción");
   }
-}
-
+};
 
 export const deletePayment = async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const deleteOne = await collection().deleteOne({
-    _id: new ObjectId(id),
-  })
-  !deleteOne ? res.status(404).send("Pago no encontrado") : res.status(200).send(deleteOne);
-}
+  try {
+    const id = req.params.id;
+    const result = await PaymentModel.delete(id);
+    if (!result?.deletedCount) return res.status(404).send("Pago no encontrado");
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).send("Error eliminando el pago");
+  }
+};

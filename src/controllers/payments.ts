@@ -39,9 +39,7 @@ export const getPayId = async (req: Request, res: Response) => {
 export const insertPayment = async (req: Request, res: Response) => {
   //VAlidaciones
   try {
-    const nuevaTransacion = await collection().insertOne({
-      $ed: req.body,
-    })
+    const nuevaTransacion = await collection().insertOne(req.body)
     res.status(202).send(nuevaTransacion);
   } catch (error) {
     console.log("no se ha podido crear una transicion");

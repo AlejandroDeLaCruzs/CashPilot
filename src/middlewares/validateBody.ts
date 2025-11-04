@@ -13,7 +13,7 @@ export const paymentMiddleware = (req: Request, res: Response, next: NextFunctio
     const result = validatePayment(req.body);
     if (!result.success) {
         return res.status(400).json({
-            message: "Error de validación",
+            message: "Error en el body", 
         });
     }
     req.body = result.data; // opcional: body ya validado y transformado

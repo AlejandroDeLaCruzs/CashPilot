@@ -23,6 +23,7 @@ export const getPayId = async (req: Request, res: Response) => {
 
 export const insertPayment = async (req: Request, res: Response) => {
   try {
+    console.log(2112)
     const nuevaTransaccion = await PaymentModel.insert(req.body);
     res.status(201).json(nuevaTransaccion);
   } catch (error) {
